@@ -1,0 +1,29 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+    <form method="POST" action="{% url 'add_task' %}" class="task-form">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="Add a new task..." required>
+        <button type="submit">Add Task</button>
+    </form>
+
+    <ul class="task-list">
+        {% for task in tasks %}
+        <li class="task-item">
+            <div class="task-content {% if task.completed %}completed{% endif %}">
+                {{ task.title }}
+            </div>
+            <div class="task-actions">
+                <a href="{% url 'complete_task' task.id %}">
+                    {% if task.completed %}Undo{% else %}Complete{% endif %}
+                </a>
+                <a href="{% url 'delete_task' task.id %}">Delete</a>
+            </div>
+        </li>
+        {% empty %}
+        <div class="empty-state">
+            <p>No tasks yet. Add one above!</p>
+        </div>
+        {% endfor %}
+    </ul>
+{% endblock %}
