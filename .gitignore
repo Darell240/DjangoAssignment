@@ -4,3 +4,19 @@ db.sqlite3
 .vscode/
 *.log
 .env
+/venv/
+.DS_Store
+
+# AWS security
+*.pem
+.aws/
+
+# Jenkins
+build/
+node_modules/
+
+# Database
+*.sqlite3-journal
+
+# IDE specific
+.idea/
