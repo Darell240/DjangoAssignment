@@ -1,16 +1,60 @@
 pipeline {
     agent any
+
+    environment {
+        PROJECT_DIR = "/var/lib/jenkins/workspace/Django-Deploy"
+        VENV_DIR = "${PROJECT_DIR}/venv"
+    }
+
     stages {
-        stage('Deploy Django') {
+        stage('Checkout') {
             steps {
-                sh '''
-                    cd /home/ubuntu/projects/DjangoAssignment
-                    git pull origin main
-                    source venv/bin/activate
-                    pip install -r requirements.txt
-                    nohup python manage.py runserver 0.0.0.0:8000 &
-                '''
+                checkout scm
             }
+        }
+
+        stage('Setup Virtual Environment') {
+            steps {
+                sh """
+                    python3 -m venv ${VENV_DIR}
+                    . ${VENV_DIR}/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                """
+            }
+        }
+
+        stage('Run Migrations') {
+            steps {
+                sh """
+                    . ${VENV_DIR}/bin/activate
+                    python manage.py migrate
+                """
+            }
+        }
+
+        stage('Collect Static Files') {
+            steps {
+                sh """
+                    . ${VENV_DIR}/bin/activate
+                    python manage.py collectstatic --noinput
+                """
+            }
+        }
+
+        stage('Restart Services') {
+            steps {
+                sh """
+                    sudo systemctl restart gunicorn
+                    sudo systemctl restart nginx
+                """
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
         }
     }
 }
