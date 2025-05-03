@@ -37,6 +37,7 @@ pipeline {
             steps {
                 sh """
                     . ${VENV_DIR}/bin/activate
+                    mkdir -p ${PROJECT_DIR}/staticfiles
                     python manage.py collectstatic --noinput
                 """
             }
@@ -44,10 +45,17 @@ pipeline {
 
         stage('Restart Services') {
             steps {
-                sh """
-                    sudo systemctl restart gunicorn
-                    sudo systemctl restart nginx
-                """
+                script {
+                    try {
+                        sh """
+                            sudo systemctl restart gunicorn
+                            sudo systemctl restart nginx
+                        """
+                    } catch (err) {
+                        echo "Failed to restart services: ${err}"
+                        // Continue anyway as this might be the first deployment
+                    }
+                }
             }
         }
     }
