@@ -53,7 +53,6 @@ pipeline {
                         """
                     } catch (err) {
                         echo "Failed to restart services: ${err}"
-                        // Continue anyway as this might be the first deployment
                     }
                 }
             }
