@@ -33,15 +33,16 @@ pipeline {
             }
         }
 
-        stage('Collect Static Files') {
-            steps {
-                sh """
-                    . ${VENV_DIR}/bin/activate
-                    mkdir -p ${PROJECT_DIR}/staticfiles
-                    python manage.py collectstatic --noinput
-                """
-            }
-        }
+       stage('Collect Static Files') {
+    steps {
+        sh """
+            . ${VENV_DIR}/bin/activate
+            mkdir -p ${PROJECT_DIR}/staticfiles
+            chmod -R 775 ${PROJECT_DIR}/staticfiles
+            python manage.py collectstatic --noinput
+        """
+    }
+}
 
         stage('Restart Services') {
             steps {
