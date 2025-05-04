@@ -18,7 +18,7 @@ pipeline {
             steps {
                 sh """
                     ${PYTHON} -m venv ${VENV_DIR}
-                    source ${VENV_DIR}/bin/activate
+                    . venv/bin/activate
                     pip install --upgrade pip
                     pip install -r requirements.txt
                 """
@@ -28,7 +28,7 @@ pipeline {
         stage('Apply Migrations') {
             steps {
                 sh """
-                    source ${VENV_DIR}/bin/activate
+                    . venv/bin/activate
                     ${PYTHON} manage.py migrate
                 """
             }
@@ -37,7 +37,7 @@ pipeline {
         stage('Collect Static Files') {
             steps {
                 sh """
-                    source ${VENV_DIR}/bin/activate
+                  . venv/bin/activate
                     ${PYTHON} manage.py collectstatic --noinput
                 """
             }
@@ -46,7 +46,7 @@ pipeline {
         stage('Run Tests (optional)') {
             steps {
                 sh """
-                    source ${VENV_DIR}/bin/activate
+                 . venv/bin/activate
                     ${PYTHON} manage.py test
                 """
             }
@@ -55,7 +55,7 @@ pipeline {
         stage('Run Server (Dev)') {
             steps {
                 sh """
-                    source ${VENV_DIR}/bin/activate
+                    . venv/bin/activate
                     nohup ${PYTHON} manage.py runserver 0.0.0.0:8000 &
                 """
             }
